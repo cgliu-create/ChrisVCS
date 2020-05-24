@@ -2,8 +2,8 @@ import os
 import sys
 
 
-def format_save_of_file(filename="", save=""):
-    return filename[0: filename.find('.')] + '-' + save + filename[filename.find('.'):]
+def format_save_of_file(file="", save=""):
+    return file[0: file.find('.')] + '-' + save + file[file.find('.'):]
 
 
 class ChrisWriter:
@@ -25,7 +25,7 @@ class ChrisWriter:
 
     # Given a path to a directory
     # Records files in that directory
-    # Does not record files that ar in an internal directory
+    # Does not record files that are in an internal directory
     def record_files(self, path=''):
         file_name_path_list = {}
         for entry in os.scandir(path):
