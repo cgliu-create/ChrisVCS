@@ -90,18 +90,25 @@ def quick_save(name="", project_path=""):
         os.remove(save_file)
         new_save(name, project_path)
 
+def show_instructions():
+    os.chdir('database')
+    instructions = open('ChrisVCS - instructions.txt').readlines()
+    for line in instructions:
+        print(line)
 
 def commands():
     if len(sys.argv) == 2:
         if sys.argv[1] == 'show_projects':
             show_projects()
+        elif sys.argv[1] == 'show_instructions':
+            show_instructions()
         else:
-            print('ARGUMENTS ERROR')
+            print('INVALID COMMAND')
     elif len(sys.argv) == 3:
         if sys.argv[1] == 'show_saves':
             show_saves(sys.argv[2])
         else:
-            print('ARGUMENTS ERROR')
+            print('INVALID COMMAND')
     elif len(sys.argv) == 4:
         if sys.argv[1] == 'new_project':
             new_project(sys.argv[2], sys.argv[3])
@@ -109,8 +116,10 @@ def commands():
             new_save(sys.argv[2], sys.argv[3])
         elif sys.argv[1] == 'load_save':
             load_save(sys.argv[2], sys.argv[3])
+        elif sys.argv[1] == 'quick_save':
+            quick_save(sys.argv[2], sys.argv[3])
         else:
-            print('ARGUMENTS ERROR')
+            print('INVALID COMMAND')
     else:
         print('INVALID ARGUMENTS')
 
