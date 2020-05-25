@@ -37,8 +37,9 @@ def show_projects():
         print(project)
 
 
-def get_saves(name=""):
-    os.chdir('database')
+def get_saves(name=''):
+    if os.path.exists('database'):
+        os.chdir('database')
     saves = []
     for entry in os.listdir(os.getcwd()):
         if entry.find('.chris') > 0 and entry.find(name) > -1:
@@ -46,7 +47,7 @@ def get_saves(name=""):
     return saves
 
 
-def show_saves(name=""):
+def show_saves(name=''):
     saves = get_saves(name)
     saves.sort()
     saves.reverse()
@@ -54,7 +55,7 @@ def show_saves(name=""):
         print(save)
 
 
-def get_recent_save(name=""):
+def get_recent_save(name=''):
     num = -1
     for save in get_saves(name):
         save_num = int(save[save.rindex('-') + 1:])
@@ -63,7 +64,7 @@ def get_recent_save(name=""):
     return num
 
 
-def new_save(name="", project_path=""):
+def new_save(name='', project_path=""):
     num = get_recent_save(name)
     previous = num
     if num == -1:
@@ -71,7 +72,7 @@ def new_save(name="", project_path=""):
     ChrisFileManager.ChrisWriter(name, project_path).write_chris_file(num + 1, previous)
 
 
-def load_save(save="", target_path=""):
+def load_save(save='', target_path=''):
     os.chdir('database')
     save_file = save + '.chris'
     if save_file in os.listdir(os.getcwd()):
@@ -81,17 +82,42 @@ def load_save(save="", target_path=""):
         print('INVALID SAVE')
 
 
-def delete_save(save=""):
+def check_file_used(file="", version="", remaining_saves=None):
+    for dif_save in remaining_saves:
+        dif_save_file = dif_save + '.chris'
+        if file in ChrisFileManager.ChrisReader(dif_save_file).files.keys():
+            if ChrisFileManager.ChrisReader(dif_save_file).file_data[file] == version:
+                return True
+    return False
+
+
+def remove_unused_files(save=''):
+    name = save[0:save.rindex('-')]
+    remaining_saves = get_saves(name)
+    remaining_saves.remove(save)
+    save_file = save + '.chris'
+    files = ChrisFileManager.ChrisReader(save_file).files.keys()
+    for entry in files:
+        version = ChrisFileManager.ChrisReader(save_file).file_data[entry]
+        used = check_file_used(entry, version, remaining_saves)
+        if not used:
+            version_file = entry[0:entry.rindex('.')]+'-'+str(version)+entry[entry.rindex('.'):]
+            if os.path.exists(version_file):
+                os.remove(version_file)
+
+
+def delete_save(save=''):
     if os.path.exists('database'):
         os.chdir('database')
     save_file = save + '.chris'
     if not os.path.exists(save_file):
         print('INVALID SAVE')
     if os.path.exists(save_file):
+        remove_unused_files(save)
         os.remove(save_file)
 
 
-def quick_save(name="", project_path=""):
+def quick_save(name='', project_path=''):
     num = get_recent_save(name)
     if num == -1:
         new_save(name, project_path)
