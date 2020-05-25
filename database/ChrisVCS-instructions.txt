@@ -4,10 +4,10 @@ Enter python3 Chris.py
 In addition to a command and its arguments separated by spaces
 
 ChrisVCS commands:
-show_projects - no arguments
+show_projects - no arguments needed
 show_saves - name of project
 new_project - name of project and then the path of where you want it
 new_save - name of project and then the path of your project
 quick_save - name of project and then the path of your project
 load_save - name of save and then the path of where you want it
-show_instructions - no arguments
+show_instructions - no arguments needed
