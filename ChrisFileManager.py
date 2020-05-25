@@ -2,8 +2,8 @@ import os
 import sys
 
 
-def format_save_of_file(file="", save=""):
-    return file[0: file.find('.')] + '-' + save + file[file.find('.'):]
+def format_save_of_file(file='', save=''):
+    return file[0: file.find('.')] + '-' + str(save) + file[file.find('.'):]
 
 
 class ChrisWriter:
@@ -85,12 +85,14 @@ class ChrisWriter:
     # Records directories and files inside
     # Records the save of the most recent change for a file
     def write_chris_file(self, name='0', previous='None'):
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
         self.record_project(self.path)
         self.save_files(name, previous)
-        chris = open(self.project + '-' + name + '.chris', 'at')
+        chris = open(self.project + '-' + str(name) + '.chris', 'at')
         chris.write(self.project + '\n')
-        chris.write(name + '\n')
-        chris.write(previous + '\n')
+        chris.write(str(name) + '\n')
+        chris.write(str(previous) + '\n')
         chris.write(str(len(self.folders)) + '\n')
         for entry in self.folders:
             path = self.folders[entry]
@@ -103,18 +105,19 @@ class ChrisWriter:
         chris.close()
 
 
-def remove_newline_char(line=""):
+def remove_newline_char(line=''):
     return line[0: line.find('\n')]
 
 
 class ChrisReader:
-    def __init__(self):
-        self.project = ""
-        self.name = ""
-        self.previous = ""
+    def __init__(self, path=''):
+        self.project = ''
+        self.name = ''
+        self.previous = ''
         self.folders = {}
         self.files = {}
         self.file_data = {}
+        self.read_chris_file(path)
 
     # Records info on saves, folders, and files
     def read_chris_file(self, path=''):
@@ -143,8 +146,8 @@ class ChrisReader:
             self.file_data[file_name] = file_version
 
     # Creates folders and files based on recorded info
-    def recreate_project(self, targetpath=""):
-        path = os.path.join(targetpath, self.project)
+    def recreate_project(self, target_path=''):
+        path = os.path.join(target_path, self.project)
         os.mkdir(path)
         for entry in self.folders:
             rel_path = self.folders[entry] + entry
