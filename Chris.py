@@ -81,20 +81,32 @@ def load_save(save="", target_path=""):
         print('INVALID SAVE')
 
 
+def delete_save(save=""):
+    if os.path.exists('database'):
+        os.chdir('database')
+    save_file = save + '.chris'
+    if not os.path.exists(save_file):
+        print('INVALID SAVE')
+    if os.path.exists(save_file):
+        os.remove(save_file)
+
+
 def quick_save(name="", project_path=""):
     num = get_recent_save(name)
     if num == -1:
         new_save(name, project_path)
     else:
-        save_file = name + '-' + str(num) + '.chris'
-        os.remove(save_file)
+        recent_save = name + '-' + str(num)
+        delete_save(recent_save)
         new_save(name, project_path)
+
 
 def show_instructions():
     os.chdir('database')
     instructions = open('ChrisVCS - instructions.txt').readlines()
     for line in instructions:
         print(line)
+
 
 def commands():
     if len(sys.argv) == 2:
@@ -107,6 +119,8 @@ def commands():
     elif len(sys.argv) == 3:
         if sys.argv[1] == 'show_saves':
             show_saves(sys.argv[2])
+        elif sys.argv[1] == 'delete_save':
+            delete_save(sys.argv[2])
         else:
             print('INVALID COMMAND')
     elif len(sys.argv) == 4:
