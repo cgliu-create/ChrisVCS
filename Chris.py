@@ -4,6 +4,11 @@ import re
 import ChrisFileManager
 
 
+# Given a project a name and a location to create the project
+# Accesses the database folder
+# Checks than there are no chris files with this project name
+# Creates a folder with the name of the project if it does not exist
+# Creates a save 0 chris file
 def new_project(name='', target_path=''):
     os.chdir('database')
     save_file = re.compile(name + r'-(\d)+' + '.chris')
@@ -20,6 +25,9 @@ def new_project(name='', target_path=''):
         ChrisFileManager.ChrisWriter(name, target).write_chris_file()
 
 
+# Accesses the database folder
+# Finds chris files
+# Returns the unique project names from those files
 def get_projects():
     os.chdir('database')
     projects = []
@@ -31,12 +39,17 @@ def get_projects():
     return projects
 
 
+# Prints the result of get_projects
 def show_projects():
     projects = get_projects()
     for project in projects:
         print(project)
 
 
+# Given the name of the project
+# If the database folder is not already accessed, accesses the database folder
+# Finds the chris files with this project name
+# Returns the names of those chris files
 def get_saves(name=''):
     if os.path.exists('database'):
         os.chdir('database')
@@ -47,6 +60,7 @@ def get_saves(name=''):
     return saves
 
 
+# Prints the result of get_saves
 def show_saves(name=''):
     saves = get_saves(name)
     saves.sort()
@@ -55,6 +69,11 @@ def show_saves(name=''):
         print(save)
 
 
+# Given the name of the project
+# Finds the chris files with this project name
+# Records the names of those chris files
+# Returns the highest save number in those names
+# Returns -1 if no chris file of this project was found
 def get_recent_save(name=''):
     num = -1
     for save in get_saves(name):
@@ -64,6 +83,9 @@ def get_recent_save(name=''):
     return num
 
 
+# Given the name of the project and the location of the project
+# Records the most recent save number
+# Creates a new chris file of the project
 def new_save(name='', project_path=""):
     num = get_recent_save(name)
     previous = num
@@ -72,6 +94,8 @@ def new_save(name='', project_path=""):
     ChrisFileManager.ChrisWriter(name, project_path).write_chris_file(num + 1, previous)
 
 
+# Given a save name and a location to create the project
+# Creates the project based off the corresponding chris file
 def load_save(save='', target_path=''):
     os.chdir('database')
     save_file = save + '.chris'
@@ -82,6 +106,8 @@ def load_save(save='', target_path=''):
         print('INVALID SAVE')
 
 
+# Given the save of a file and a list of the other saves
+# Returns true if this save of a file is used by another save, false if not
 def check_file_used(file="", version="", remaining_saves=None):
     for dif_save in remaining_saves:
         dif_save_file = dif_save + '.chris'
@@ -91,6 +117,10 @@ def check_file_used(file="", version="", remaining_saves=None):
     return False
 
 
+# Given the save name
+# Records the other saves of the project
+# Checks every file described by the chris file of this save name
+# Removes the file if it not used by another save
 def remove_unused_files(save=''):
     name = save[0:save.rindex('-')]
     remaining_saves = get_saves(name)
@@ -101,11 +131,15 @@ def remove_unused_files(save=''):
         version = ChrisFileManager.ChrisReader(save_file).file_data[entry]
         used = check_file_used(entry, version, remaining_saves)
         if not used:
-            version_file = entry[0:entry.rindex('.')]+'-'+str(version)+entry[entry.rindex('.'):]
+            version_file = entry[0:entry.rindex('.')] + '-' + str(version) + entry[entry.rindex('.'):]
             if os.path.exists(version_file):
                 os.remove(version_file)
 
 
+# Given the save name
+# If the database folder is not already accessed, accesses the database folder
+# Checks if a chris file with this save name exists
+# Removes this chris file and its unused files
 def delete_save(save=''):
     if os.path.exists('database'):
         os.chdir('database')
@@ -117,6 +151,9 @@ def delete_save(save=''):
         os.remove(save_file)
 
 
+# Given the name of the project and the location of the project
+# Deletes the most recent chris file save
+# Creates a new chris file of the project
 def quick_save(name='', project_path=''):
     num = get_recent_save(name)
     if num == -1:
@@ -127,13 +164,15 @@ def quick_save(name='', project_path=''):
         new_save(name, project_path)
 
 
+# Prints the ChrisVCS-instructions
 def show_instructions():
     os.chdir('database')
-    instructions = open('ChrisVCS - instructions.txt').readlines()
+    instructions = open('ChrisVCS-instructions.txt').readlines()
     for line in instructions:
         print(line)
 
 
+# Terminal Commands
 def commands():
     if len(sys.argv) == 2:
         if sys.argv[1] == 'show_projects':

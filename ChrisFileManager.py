@@ -119,7 +119,8 @@ class ChrisReader:
         self.file_data = {}
         self.read_chris_file(path)
 
-    # Records info on saves, folders, and files
+    # Given the path of a chris file
+    # Records its info on saves, folders, and files
     def read_chris_file(self, path=''):
         content = open(path).readlines()
         self.project = remove_newline_char(content[0])
@@ -145,6 +146,7 @@ class ChrisReader:
             self.files[file_name] = file_location
             self.file_data[file_name] = file_version
 
+    # Given the location to create the project
     # Creates folders and files based on recorded info
     def recreate_project(self, target_path=''):
         path = os.path.join(target_path, self.project)
