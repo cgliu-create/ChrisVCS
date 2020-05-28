@@ -2,7 +2,7 @@ import os
 import sys
 
 
-def format_save_of_file(file='', save=''):
+def formatSaveFile(file='', save=''):
     return file[0: file.find('.')] + '-' + str(save) + file[file.find('.'):]
 
 
@@ -16,7 +16,7 @@ class ChrisWriter:
 
     # Given a path to a directory
     # Records internal directories in that directory
-    def record_folders(self, path=''):
+    def recordFolders(self, path=''):
         folder_name_path_list = {}
         for entry in os.scandir(path):
             if os.path.isdir(entry):
@@ -26,7 +26,7 @@ class ChrisWriter:
     # Given a path to a directory
     # Records files in that directory
     # Does not record files that are in an internal directory
-    def record_files(self, path=''):
+    def recordFiles(self, path=''):
         file_name_path_list = {}
         for entry in os.scandir(path):
             if os.path.isfile(entry) and entry.name != '.DS_Store':
@@ -36,15 +36,15 @@ class ChrisWriter:
     # Given a path to a directory
     # Records and opens every internal directory
     # Records all files
-    def record_project(self, path=''):
-        files = self.record_files(path)
+    def recordProject(self, path=''):
+        files = self.recordFiles(path)
         for entry in files:
             self.files[entry] = files[entry]
-        folders = self.record_folders(path)
+        folders = self.recordFolders(path)
         if len(folders) >= 1:
             for entry in folders:
                 self.folders[entry] = folders[entry]
-                self.record_project(os.path.join(self.path, folders[entry]))
+                self.recordProject(os.path.join(self.path, folders[entry]))
 
     # Given the new save name and previous save name
     # Goes through files
@@ -52,17 +52,17 @@ class ChrisWriter:
     # Compares the current file to the save
     # if there is a change, creates and records a new save
     # if it is unchanged, records the old save
-    def save_files(self, name='0', previous='None'):
+    def saveFiles(self, name='0', previous='None'):
         for entry in self.files:
             path = os.path.join(self.path, self.files[entry])
             save_content = cur_content = open(path).readlines()
-            recent_save = new_save = format_save_of_file(entry, name)
+            recent_save = new_save = formatSaveFile(entry, name)
             unique = True
             if previous != 'None':
                 recent = int(previous)
                 found = False
                 while not found:
-                    recent_save = format_save_of_file(entry, str(recent))
+                    recent_save = formatSaveFile(entry, str(recent))
                     if os.path.exists(recent_save):
                         save_content = open(recent_save).readlines()
                         found = True
@@ -84,11 +84,11 @@ class ChrisWriter:
     # Given the new save name and previous save name
     # Records directories and files inside
     # Records the save of the most recent change for a file
-    def write_chris_file(self, name='0', previous='None'):
+    def writeChrisFile(self, name='0', previous='None'):
         if not os.path.exists(self.path):
             os.mkdir(self.path)
-        self.record_project(self.path)
-        self.save_files(name, previous)
+        self.recordProject(self.path)
+        self.saveFiles(name, previous)
         chris = open(self.project + '-' + str(name) + '.chris', 'at')
         chris.write(self.project + '\n')
         chris.write(str(name) + '\n')
@@ -105,7 +105,7 @@ class ChrisWriter:
         chris.close()
 
 
-def remove_newline_char(line=''):
+def removeNewlineChar(line=''):
     return line[0: line.find('\n')]
 
 
@@ -117,28 +117,28 @@ class ChrisReader:
         self.folders = {}
         self.files = {}
         self.file_data = {}
-        self.read_chris_file(path)
+        self.readChrisFile(path)
 
     # Given the path of a chris file
     # Records its info on saves, folders, and files
-    def read_chris_file(self, path=''):
+    def readChrisFile(self, path=''):
         content = open(path).readlines()
-        self.project = remove_newline_char(content[0])
-        self.name = remove_newline_char(content[1])
-        self.previous = remove_newline_char(content[2])
-        folder_num = int(remove_newline_char(content[3]))
+        self.project = removeNewlineChar(content[0])
+        self.name = removeNewlineChar(content[1])
+        self.previous = removeNewlineChar(content[2])
+        folder_num = int(removeNewlineChar(content[3]))
         start = 4
         end = start + folder_num
         for i in range(start, end):
-            folder_info = remove_newline_char(content[i])
+            folder_info = removeNewlineChar(content[i])
             folder_name = folder_info[0:folder_info.find(':')]
             folder_location = folder_info[folder_info.find(':') + 1:]
             self.folders[folder_name] = folder_location
-        file_num = int(remove_newline_char(content[end]))
+        file_num = int(removeNewlineChar(content[end]))
         start = end + 1
         end = start + file_num
         for i in range(start, end):
-            file_info = remove_newline_char(content[i])
+            file_info = removeNewlineChar(content[i])
             file_name = file_info[0:file_info.find(':')]
             file_info = file_info[file_info.find(':') + 1:]
             file_location = file_info[0:file_info.find(':')]
@@ -148,7 +148,7 @@ class ChrisReader:
 
     # Given the location to create the project
     # Creates folders and files based on recorded info
-    def recreate_project(self, target_path=''):
+    def recreateProject(self, target_path=''):
         path = os.path.join(target_path, self.project)
         os.mkdir(path)
         for entry in self.folders:
@@ -162,4 +162,3 @@ class ChrisReader:
             save_file = format_save_of_file(entry, save)
             content = open(save_file).readlines()
             open(file_path, 'x').writelines(content)
-
